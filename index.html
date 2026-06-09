@@ -382,6 +382,49 @@ try {
     );
 }
 }
+async function restaurarBackup() {
+
+    try {
+
+        const resposta =
+            await fetch(URL_GOOGLE_SCRIPT);
+
+        const dados =
+            await resposta.json();
+
+        localStorage.setItem(
+            "bolao_participantes",
+            JSON.stringify(dados.participantes)
+        );
+
+        localStorage.setItem(
+            "bolao_jogos",
+            JSON.stringify(dados.jogos)
+        );
+
+        localStorage.setItem(
+            "bolao_apostas",
+            JSON.stringify(dados.apostas)
+        );
+
+        alert(
+            "Backup restaurado!"
+        );
+
+        location.reload();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+            "Erro ao restaurar backup."
+        );
+
+    }
+
+}
+		
 setInterval(() => {
 
     sincronizarBackup();
