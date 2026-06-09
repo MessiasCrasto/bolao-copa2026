@@ -362,8 +362,9 @@ const payload = {
         localStorage.getItem("bolao_apostas") || "[]"
     )
 };
+
 try {
-    const resposta = await fetch(
+    await fetch(
         URL_GOOGLE_SCRIPT,
         {
             method: "POST",
@@ -372,13 +373,12 @@ try {
         }
     );
     alert(
-        "Backup enviado para o Google Sheets."
+        "Backup salvo com sucesso!"
     );
-}
-catch (erro) {
+} catch (erro) {
     console.error(erro);
     alert(
-        "Erro: " + erro.message
+        "Erro ao salvar backup."
     );
 }
 }
