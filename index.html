@@ -351,41 +351,36 @@
 const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwyt-8Z3nM224TKuVodoWSOo2ynCqSP6Dgw9O7SWYHSJlrY6RpteJ3VuCxHHOD03rei/exec";
 
 async function sincronizarBackup() {
-
-    const payload = {
-        teste: "bolao"
-    };
-
-    try {
-
-        const resposta = await fetch(
-            URL_GOOGLE_SCRIPT,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify(payload)
-            }
-        );
-
-        const texto = await resposta.text();
-
-        console.log(texto);
-
-        alert(texto);
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert(
-            "Erro completo:\n" +
-            erro.message
-        );
-
-    }
-
+const payload = {
+    participantes: JSON.parse(
+        localStorage.getItem("bolao_participantes") || "[]"
+    ),
+    jogos: JSON.parse(
+        localStorage.getItem("bolao_jogos") || "[]"
+    ),
+    apostas: JSON.parse(
+        localStorage.getItem("bolao_apostas") || "[]"
+    )
+};
+try {
+    const resposta = await fetch(
+        URL_GOOGLE_SCRIPT,
+        {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(payload)
+        }
+    );
+    alert(
+        "Backup enviado para o Google Sheets."
+    );
+}
+catch (erro) {
+    console.error(erro);
+    alert(
+        "Erro: " + erro.message
+    );
+}
 }
 setInterval(() => {
 
