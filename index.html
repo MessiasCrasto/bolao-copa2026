@@ -352,31 +352,12 @@ const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwyt-8Z3nM224
 
 async function sincronizarBackup() {
 
+```
+const payload = {
+    teste: "funcionando"
+};
 
 try {
-
-    const participantes =
-        JSON.parse(
-            localStorage.getItem("bolao_participantes") || "[]"
-        );
-
-    const jogos =
-        JSON.parse(
-            localStorage.getItem("bolao_jogos") || "[]"
-        );
-
-    const apostas =
-        JSON.parse(
-            localStorage.getItem("bolao_apostas") || "[]"
-        );
-
-    const payload = {
-
-        participantes,
-        jogos,
-        apostas
-
-    };
 
     const resposta = await fetch(
         URL_GOOGLE_SCRIPT,
@@ -391,35 +372,23 @@ try {
 
     const resultado = await resposta.json();
 
-    if(resultado.sucesso){
+    console.log(resultado);
 
-        console.log(
-            "Backup realizado com sucesso"
-        );
-
-        alert(
-            "Backup online realizado!"
-        );
-
-    } else {
-
-        alert(
-            "Erro ao sincronizar."
-        );
-
-    }
+    alert(
+        JSON.stringify(resultado, null, 2)
+    );
 
 }
-catch(erro){
+catch (erro) {
 
     console.error(erro);
 
     alert(
-        "Erro ao conectar com Google Sheets."
+        "Erro: " + erro.message
     );
 
 }
-
+```
 
 }
 
