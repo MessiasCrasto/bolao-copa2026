@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão Copa do Mundo 2026</title>
+    <style>
+        :root {
+            --primary-color: #006430;
+            --secondary-color: #d4af37;
+            --background-color: #f4f6f9;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --danger-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 5px solid var(--secondary-color);
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #004d25;
+            padding: 10px;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        nav button:hover, nav button.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button.btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button.btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            color: var(--primary-color);
+        }
+
+        /* Grid de Jogos/Apostas */
+        .match-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+
+        .match-teams {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-weight: bold;
+        }
+
+        .match-score-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .match-score-inputs input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .match-info {
+            flex: 1;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge.waiting { background-color: #ffc107; color: #333; }
+        .badge.closed { background-color: #28a745; }
+        .badge.locked { background-color: var(--danger-color); }
+
+        .alert-info {
+            background-color: #e2f0d9;
+            color: #385723;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Bolão Copa do Mundo FIFA 2026</h1>
+        <p>Painel de Controle e Classificação da Fase de Grupos</p>
+
+<button onclick="sincronizarBackup()">
+    ☁ Salvar Backup
+</button>
+
+<button onclick="restaurarBackup()">
+    ⬇ Restaurar Backup
+</button>
+
+    </header>
+
+    <nav>
+        <button onclick="switchTab('ranking')" id="tab-ranking" class="active">Ranking</button>
+        <button onclick="switchTab('participantes')" id="tab-participantes">Participantes</button>
+        <button onclick="switchTab('apostas')" id="tab-apostas">Lançar Palpites</button>
+        <button onclick="switchTab('jogos')" id="tab-jogos">Resultados Reais (Admin)</button>
+    </nav>
+
+    <div class="container">
+
+        <div id="content-ranking" class="tab-content active">
+            <div class="card">
+                <h2>Classificação Geral</h2>
+		<p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+			 1. Acerto de Placar Exato (5 pontos) </p>
+		<p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+			 2. Acerto do Resultado (Vitória/Empate) mas erro de placar (2 pontos) </p>
+		<p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+			 3. Erro Total (0 pontos) </p>
+                <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+
+                    * <strong>Critério de Desempate (Cravadas):</strong> Maior número de acertos de Placar Exato (5 pontos).
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Nome</th>
+                            <th>Pontos Totais</th>
+                            <th>Placares Exatos (Cravadas)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="content-participantes" class="tab-content">
+            <div class="card">
+                <h2>Cadastrar Novo Participante</h2>
+                <form id="form-participante" onsubmit="cadastrarParticipante(event)">
+                    <div class="form-group">
+                        <label for="part-nome">Nome Completo:</label>
+                        <input type="text" id="part-nome" required placeholder="Ex: João Silva">
+                    </div>
+                                       <button type="submit" class="btn">Cadastrar</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Participantes Cadastrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                        </tr>
+                    </thead>
+                    <tbody id="participantes-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="content-apostas" class="tab-content">
+            <div class="card">
+                <h2>Registrar Palpites</h2>
+                <div class="form-group">
+                    <label for="select-participante">Selecione o Participante:</label>
+                    <select id="select-participante" onchange="carregarJogosParaAposta()">
+                        <option value="">-- Escolha um participante --</option>
+                    </select>
+                </div>
+                
+                <div id="alert-trava-aposta" class="alert-info" style="display:none;">
+                    Nota: Jogos cujo horário de início já passou estarão bloqueados para novos palpites.
+                </div>
+
+                <div id="lista-jogos-aposta">
+                    <p style="color: #666;">Selecione um participante para gerenciar as apostas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-jogos" class="tab-content">
+            <div class="card">
+                <h2>Cadastrar Novo Jogo</h2>
+                <form id="form-jogo" onsubmit="cadastrarJogo(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="jogo-time-a">Seleção A:</label>
+                            <input type="text" id="jogo-time-a" required placeholder="Ex: Brasil">
+                        </div>
+                        <div class="form-group">
+                            <label for="jogo-time-b">Seleção B:</label>
+                            <input type="text" id="jogo-time-b" required placeholder="Ex: França">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="jogo-grupo">Grupo:</label>
+                            <input type="text" id="jogo-grupo" required placeholder="Ex: Grupo A">
+                        </div>
+                        <div class="form-group">
+                            <label for="jogo-data">Data/Hora de Início:</label>
+                            <input type="datetime-local" id="jogo-data" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Adicionar Jogo</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Atualizar Resultados dos Jogos Realizados</h2>
+                <div id="lista-jogos-admin">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+
+const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwyt-8Z3nM224TKuVodoWSOo2ynCqSP6Dgw9O7SWYHSJlrY6RpteJ3VuCxHHOD03rei/exec";
+
+async function sincronizarBackup() {
+
+
+try {
+
+    const participantes =
+        JSON.parse(
+            localStorage.getItem("bolao_participantes") || "[]"
+        );
+
+    const jogos =
+        JSON.parse(
+            localStorage.getItem("bolao_jogos") || "[]"
+        );
+
+    const apostas =
+        JSON.parse(
+            localStorage.getItem("bolao_apostas") || "[]"
+        );
+
+    const payload = {
+
+        participantes,
+        jogos,
+        apostas
+
+    };
+
+    const resposta = await fetch(
+        URL_GOOGLE_SCRIPT,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        }
+    );
+
+    const resultado = await resposta.json();
+
+    if(resultado.sucesso){
+
+        console.log(
+            "Backup realizado com sucesso"
+        );
+
+        alert(
+            "Backup online realizado!"
+        );
+
+    } else {
+
+        alert(
+            "Erro ao sincronizar."
+        );
+
+    }
+
+}
+catch(erro){
+
+    console.error(erro);
+
+    alert(
+        "Erro ao conectar com Google Sheets."
+    );
+
+}
+
+
+}
+
+async function restaurarBackup() {
+
+    try {
+
+        const resposta =
+            await fetch(URL_GOOGLE_SCRIPT);
+
+        const dados =
+            await resposta.json();
+
+        localStorage.setItem(
+            "bolao_participantes",
+            JSON.stringify(dados.participantes)
+        );
+
+        localStorage.setItem(
+            "bolao_jogos",
+            JSON.stringify(dados.jogos)
+        );
+
+        localStorage.setItem(
+            "bolao_apostas",
+            JSON.stringify(dados.apostas)
+        );
+
+        alert(
+            "Backup restaurado com sucesso!"
+        );
+
+        location.reload();
+
+    }
+    catch(erro){
+
+        console.error(erro);
+
+        alert(
+            "Erro ao restaurar backup."
+        );
+
+    }
+
+}
+setInterval(() => {
+
+    sincronizarBackup();
+
+}, 300000);
+
+
+        // ==========================================
+        // INICIALIZAÇÃO DE DADOS (Simulação de DB)
+        // ==========================================
+        let participantes = JSON.parse(localStorage.getItem('bolao_participantes')) || [];
+        let jogos = JSON.parse(localStorage.getItem('bolao_jogos')) || [];
+        let apostas = JSON.parse(localStorage.getItem('bolao_apostas')) || [];
+
+        // Carga inicial de jogos exemplo se a lista estiver vazia
+        if (jogos.length === 0) {
+            jogos = [
+    {
+        "id": 1,
+        "time_a": "México",
+        "time_b": "África do Sul",
+        "grupo": "Grupo A",
+        "data_hora": new Date("11/06/2026"),
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 2,
+        "time_a": "Coreia do Sul",
+        "time_b": "Tchéquia",
+        "grupo": "Grupo A",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 3,
+        "time_a": "México",
+        "time_b": "Coreia do Sul",
+        "grupo": "Grupo A",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 4,
+        "time_a": "Tchéquia",
+        "time_b": "África do Sul",
+        "grupo": "Grupo A",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 5,
+        "time_a": "Tchéquia",
+        "time_b": "México",
+        "grupo": "Grupo A",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 6,
+        "time_a": "África do Sul",
+        "time_b": "Coreia do Sul",
+        "grupo": "Grupo A",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 7,
+        "time_a": "Canadá",
+        "time_b": "Bósnia e Herzegovina",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 8,
+        "time_a": "Catar",
+        "time_b": "Suíça",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 9,
+        "time_a": "Canadá",
+        "time_b": "Catar",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 10,
+        "time_a": "Suíça",
+        "time_b": "Bósnia e Herzegovina",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 11,
+        "time_a": "Suíça",
+        "time_b": "Canadá",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 12,
+        "time_a": "Bósnia e Herzegovina",
+        "time_b": "Catar",
+        "grupo": "Grupo B",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 13,
+        "time_a": "Brasil",
+        "time_b": "Marrocos",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 14,
+        "time_a": "Haiti",
+        "time_b": "Escócia",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 15,
+        "time_a": "Brasil",
+        "time_b": "Haiti",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 16,
+        "time_a": "Escócia",
+        "time_b": "Marrocos",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 17,
+        "time_a": "Escócia",
+        "time_b": "Brasil",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 18,
+        "time_a": "Marrocos",
+        "time_b": "Haiti",
+        "grupo": "Grupo C",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 19,
+        "time_a": "Estados Unidos",
+        "time_b": "Paraguai",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 20,
+        "time_a": "Austrália",
+        "time_b": "Turquia",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 21,
+        "time_a": "Estados Unidos",
+        "time_b": "Austrália",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 22,
+        "time_a": "Turquia",
+        "time_b": "Paraguai",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 23,
+        "time_a": "Turquia",
+        "time_b": "Estados Unidos",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 24,
+        "time_a": "Paraguai",
+        "time_b": "Austrália",
+        "grupo": "Grupo D",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 25,
+        "time_a": "Alemanha",
+        "time_b": "Curaçao",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 26,
+        "time_a": "Costa do Marfim",
+        "time_b": "Equador",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 27,
+        "time_a": "Alemanha",
+        "time_b": "Costa do Marfim",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 28,
+        "time_a": "Equador",
+        "time_b": "Curaçao",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 29,
+        "time_a": "Equador",
+        "time_b": "Alemanha",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 30,
+        "time_a": "Curaçao",
+        "time_b": "Costa do Marfim",
+        "grupo": "Grupo E",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 31,
+        "time_a": "Holanda",
+        "time_b": "Japão",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 32,
+        "time_a": "Suécia",
+        "time_b": "Tunísia",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 33,
+        "time_a": "Holanda",
+        "time_b": "Suécia",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 34,
+        "time_a": "Tunísia",
+        "time_b": "Japão",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 35,
+        "time_a": "Tunísia",
+        "time_b": "Holanda",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 36,
+        "time_a": "Japão",
+        "time_b": "Suécia",
+        "grupo": "Grupo F",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 37,
+        "time_a": "Bélgica",
+        "time_b": "Egito",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 38,
+        "time_a": "Irã",
+        "time_b": "Nova Zelândia",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 39,
+        "time_a": "Bélgica",
+        "time_b": "Irã",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 40,
+        "time_a": "Nova Zelândia",
+        "time_b": "Egito",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 41,
+        "time_a": "Nova Zelândia",
+        "time_b": "Bélgica",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 42,
+        "time_a": "Egito",
+        "time_b": "Irã",
+        "grupo": "Grupo G",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 43,
+        "time_a": "Espanha",
+        "time_b": "Cabo Verde",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 44,
+        "time_a": "Arábia Saudita",
+        "time_b": "Uruguai",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 45,
+        "time_a": "Espanha",
+        "time_b": "Arábia Saudita",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 46,
+        "time_a": "Uruguai",
+        "time_b": "Cabo Verde",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 47,
+        "time_a": "Uruguai",
+        "time_b": "Espanha",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 48,
+        "time_a": "Cabo Verde",
+        "time_b": "Arábia Saudita",
+        "grupo": "Grupo H",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 49,
+        "time_a": "França",
+        "time_b": "Senegal",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 50,
+        "time_a": "Iraque",
+        "time_b": "Noruega",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 51,
+        "time_a": "França",
+        "time_b": "Iraque",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 52,
+        "time_a": "Noruega",
+        "time_b": "Senegal",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 53,
+        "time_a": "Noruega",
+        "time_b": "França",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 54,
+        "time_a": "Senegal",
+        "time_b": "Iraque",
+        "grupo": "Grupo I",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 55,
+        "time_a": "Argentina",
+        "time_b": "Argélia",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 56,
+        "time_a": "Áustria",
+        "time_b": "Jordânia",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 57,
+        "time_a": "Argentina",
+        "time_b": "Áustria",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 58,
+        "time_a": "Jordânia",
+        "time_b": "Argélia",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 59,
+        "time_a": "Jordânia",
+        "time_b": "Argentina",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 60,
+        "time_a": "Argélia",
+        "time_b": "Áustria",
+        "grupo": "Grupo J",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 61,
+        "time_a": "Portugal",
+        "time_b": "RD Congo",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 62,
+        "time_a": "Uzbequistão",
+        "time_b": "Colômbia",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 63,
+        "time_a": "Portugal",
+        "time_b": "Uzbequistão",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 64,
+        "time_a": "Colômbia",
+        "time_b": "RD Congo",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 65,
+        "time_a": "Colômbia",
+        "time_b": "Portugal",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 66,
+        "time_a": "RD Congo",
+        "time_b": "Uzbequistão",
+        "grupo": "Grupo K",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 67,
+        "time_a": "Inglaterra",
+        "time_b": "Croácia",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 68,
+        "time_a": "Gana",
+        "time_b": "Panamá",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 69,
+        "time_a": "Inglaterra",
+        "time_b": "Gana",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 70,
+        "time_a": "Panamá",
+        "time_b": "Croácia",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 71,
+        "time_a": "Panamá",
+        "time_b": "Inglaterra",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    },
+    {
+        "id": 72,
+        "time_a": "Croácia",
+        "time_b": "Gana",
+        "grupo": "Grupo L",
+        "data_hora": null,
+        "gols_a_real": null,
+        "gols_b_real": null,
+        "status": "AGUARDANDO"
+    }
+];
+            salvarDados();
+        }
+
+
+        function salvarDados() {
+            localStorage.setItem('bolao_participantes', JSON.stringify(participantes));
+            localStorage.setItem('bolao_jogos', JSON.stringify(jogos));
+            localStorage.setItem('bolao_apostas', JSON.stringify(apostas));
+        }
+
+        // Navegação de Abas
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`content-${tabName}`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            if (tabName === 'ranking') renderRanking();
+            if (tabName === 'participantes') renderParticipantes();
+            if (tabName === 'apostas') carregarSelectParticipantes();
+            if (tabName === 'jogos') renderJogosAdmin();
+        }
+
+        // ==========================================
+        // MOTOR DE CÁLCULO (RF04)
+        // ==========================================
+        function calcularPontos(golsA_aposta, golsB_aposta, golsA_real, golsB_real) {
+            if (golsA_real === null || golsB_real === null) return 0;
+            
+            // 1. Acerto de Placar Exato (5 pontos)
+            if (golsA_aposta === golsA_real && golsB_aposta === golsB_real) {
+                return 5;
+            }
+
+            // 2. Acerto do Resultado (Vitória/Empate) mas erro de placar (2 pontos)
+            const vitAAposta = golsA_aposta > golsB_aposta;
+            const vitAReal = golsA_real > golsB_real;
+            
+            const vitBAposta = golsA_aposta < golsB_aposta;
+            const vitBReal = golsA_real < golsB_real;
+            
+            const empateAposta = golsA_aposta === golsB_aposta;
+            const empateReal = golsA_real === golsB_real;
+
+            if ((vitAAposta && vitAReal) || (vitBAposta && vitBReal) || (empateAposta && empateReal)) {
+                return 2;
+            }
+
+            // 3. Erro Total (0 pontos)
+            return 0;
+        }
+
+        function reprocessarTodasAsPontuacoes() {
+            apostas.forEach(aposta => {
+                const jogo = jogos.find(j => j.id === aposta.jogo_id);
+                if (jogo && jogo.status === "ENCERRADO") {
+                    aposta.pontos_conquistados = calcularPontos(
+                        aposta.gols_a_aposta, aposta.gols_b_aposta,
+                        jogo.gols_a_real, jogo.gols_b_real
+                    );
+                } else {
+                    aposta.pontos_conquistados = 0;
+                }
+            });
+            salvarDados();
+        }
+
+        // ==========================================
+        // FUNÇÕES: PARTICIPANTES (RF01)
+        // ==========================================
+        function cadastrarParticipante(e) {
+            e.preventDefault();
+            const nome = document.getElementById('part-nome').value;
+            //const email = document.getElementById('part-email').value;
+
+            if (participantes.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+                alert("Este nome já está cadastrado!");
+                return;
+            }
+
+            const novo = { id: Date.now(), nome };
+            participantes.push(novo);
+            salvarDados();
+            document.getElementById('form-participante').reset();
+            renderParticipantes();
+        }
+
+        function renderParticipantes() {
+            const tbody = document.getElementById('participantes-body');
+            tbody.innerHTML = participantes.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.nome}</td>
+                    
+                </tr>
+            `).join('');
+        }
+
+        // ==========================================
+        // FUNÇÕES: APOSTAS (RF03)
+        // ==========================================
+        function carregarSelectParticipantes() {
+            const select = document.getElementById('select-participante');
+            const valorSelecionado = select.value;
+            select.innerHTML = '<option value="">-- Escolha um participante --</option>' + 
+                participantes.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+            select.value = valorSelecionado;
+            carregarJogosParaAposta();
+        }
+
+        function carregarJogosParaAposta() {
+            const partId = parseInt(document.getElementById('select-participante').value);
+            const container = document.getElementById('lista-jogos-aposta');
+            const alertTrava = document.getElementById('alert-trava-aposta');
+
+            if (!partId) {
+                container.innerHTML = '<p style="color: #666;">Selecione um participante para gerenciar as apostas.</p>';
+                alertTrava.style.display = "none";
+                return;
+            }
+
+            alertTrava.style.display = "block";
+            container.innerHTML = "";
+
+            jogos.forEach(jogo => {
+                const apostaExistente = apostas.find(a => a.participante_id === partId && a.jogo_id === jogo.id);
+                const golsA = apostaExistente ? apostaExistente.gols_a_aposta : "";
+                const golsB = apostaExistente ? apostaExistente.gols_b_aposta : "";
+                
+               // Regra de Trava por Horário (RF03)
+	       jogo.data_hora = "31/12/1969, 21:00:00"
+               const jogoPassou = new Date() >= new Date(jogo.data_hora); //jogo.data_hora
+               const desabilitado = jogoPassou ? "disabled" : "";
+               const badgeStatus = jogoPassou ? `<span class="badge locked">Bloqueado (Jogo Iniciado)</span>` : `<span class="badge waiting">Aberto</span>`;
+
+                const div = document.createElement('div');
+                div.className = "match-card";
+                div.innerHTML = `
+                    <div class="match-info">
+                        <strong>${jogo.grupo}</strong><br>
+                        ${new Date(jogo.data_hora).toLocaleString('pt-BR')}<br>
+                        ${badgeStatus}
+                    </div>
+                    <div class="match-teams">
+                        <span>${jogo.time_a}</span>
+                        <div class="match-score-inputs">
+                            <input type="number" min="0" value="${golsA}" id="aposta-${jogo.id}-a" ${desabilitado}>
+                            X
+                            <input type="number" min="0" value="${golsB}" id="aposta-${jogo.id}-b" ${desabilitado}>
+                        </div>
+                        <span>${jogo.time_b}</span>
+                    </div>
+                    <div>
+                        ${!jogoPassou ? `<button class="btn" style="padding: 5px 10px; font-size:12px;" onclick="salvarAposta(${partId}, ${jogo.id})">Salvar</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function salvarAposta(partId, jogoId) {
+            const golsA = document.getElementById(`aposta-${jogoId}-a`).value;
+            const golsB = document.getElementById(`aposta-${jogoId}-b`).value;
+
+            if (golsA === "" || golsB === "") {
+                alert("Preencha ambos os campos de gols do palpite.");
+                return;
+            }
+
+           const jogo = jogos.find(j => j.id === jogoId);
+            if (new Date() >= new Date(jogo.data_hora)) {
+                alert("Erro de Trava: O horário deste jogo já começou ou passou!");
+                carregarJogosParaAposta();
+                return;
+            }
+
+            let idx = apostas.findIndex(a => a.participante_id === partId && a.jogo_id === jogoId);
+            const dadosAposta = {
+                id: idx !== -1 ? apostas[idx].id : Date.now(),
+                participante_id: partId,
+                jogo_id: jogoId,
+                gols_a_aposta: parseInt(golsA),
+                gols_b_aposta: parseInt(golsB),
+                pontos_conquistados: 0
+            };
+
+            if (idx !== -1) {
+                apostas[idx] = dadosAposta;
+            } else {
+                apostas.push(dadosAposta);
+            }
+
+            salvarDados();
+            reprocessarTodasAsPontuacoes();
+            alert("Palpite salvo com sucesso!");
+        }
+
+        // ==========================================
+        // FUNÇÕES: JOGOS (RF02)
+        // ==========================================
+        function cadastrarJogo(e) {
+            e.preventDefault();
+            const time_a = document.getElementById('jogo-time-a').value;
+            const time_b = document.getElementById('jogo-time-b').value;
+            const grupo = document.getElementById('jogo-grupo').value;
+            const data_hora = document.getElementById('jogo-data').value;
+
+            const novoJogo = {
+                id: Date.now(),
+                time_a, time_b, grupo, data_hora,
+                gols_a_real: null, gols_b_real: null,
+                status: "AGUARDANDO"
+            };
+
+            jogos.push(novoJogo);
+            salvarDados();
+            document.getElementById('form-jogo').reset();
+            renderJogosAdmin();
+        }
+
+        function renderJogosAdmin() {
+            const container = document.getElementById('lista-jogos-admin');
+            container.innerHTML = "";
+
+            jogos.forEach(jogo => {
+                const golsA = jogo.gols_a_real !== null ? jogo.gols_a_real : "";
+                const golsB = jogo.gols_b_real !== null ? jogo.gols_b_real : "";
+                const isEncerrado = jogo.status === "ENCERRADO";
+
+                const div = document.createElement('div');
+                div.className = "match-card";
+                div.innerHTML = `
+                    <div class="match-info">
+                        <strong>${jogo.grupo}</strong><br>
+                        ${new Date(jogo.data_hora).toLocaleString('pt-BR')}<br>
+                        <span class="badge ${isEncerrado ? 'closed' : 'waiting'}">${jogo.status}</span>
+                    </div>
+                    <div class="match-teams">
+                        <span>${jogo.time_a}</span>
+                        <div class="match-score-inputs">
+                            <input type="number" min="0" value="${golsA}" id="real-${jogo.id}-a">
+                            X
+                            <input type="number" min="0" value="${golsB}" id="real-${jogo.id}-b">
+                        </div>
+                        <span>${jogo.time_b}</span>
+                    </div>
+                    <div>
+                        <button class="btn" style="padding: 6px 12px; font-size:13px; background-color: #28a745;" onclick="encerrarJogo(${jogo.id})">
+                            Definir Placar
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function encerrarJogo(jogoId) {
+            const golsA = document.getElementById(`real-${jogoId}-a`).value;
+            const golsB = document.getElementById(`real-${jogoId}-b`).value;
+
+            if (golsA === "" || golsB === "") {
+                alert("Preencha o placar oficial antes de fechar.");
+                return;
+            }
+
+            let jogo = jogos.find(j => j.id === jogoId);
+            jogo.gols_a_real = parseInt(golsA);
+            jogo.gols_b_real = parseInt(golsB);
+            jogo.status = "ENCERRADO";
+
+            salvarDados();
+            reprocessarTodasAsPontuacoes();
+            alert("Placar oficial registrado! Pontuações recalculadas automaticamente.");
+            renderJogosAdmin();
+        }
+
+        // ==========================================
+        // FUNÇÕES: RANKING E CRITÉRIOS DE DESEMPATE
+        // ==========================================
+        function renderRanking() {
+            const tbody = document.getElementById('ranking-body');
+            
+            let rankingData = participantes.map(p => {
+                const apostasDoParticipante = apostas.filter(a => a.participante_id === p.id);
+                const pontosTotais = apostasDoParticipante.reduce((acc, a) => acc + a.pontos_conquistados, 0);
+                const placaresExatos = apostasDoParticipante.filter(a => a.pontos_conquistados === 5).length;
+
+                return {
+                    nome: p.nome,
+                    pontosTotais,
+                    placaresExatos
+                };
+            });
+
+            // Algoritmo de Ordenação: Pontos Totais (Decrescente) -> Placares Exatos (Decrescente)
+            rankingData.sort((a, b) => {
+                if (b.pontosTotais !== a.pontosTotais) {
+                    return b.pontosTotais - a.pontosTotais;
+                }
+                return b.placaresExatos - a.placaresExatos;
+            });
+
+            tbody.innerHTML = rankingData.map((r, index) => `
+                <tr>
+                    <td><strong>${index + 1}º</strong></td>
+                    <td>${r.nome}</td>
+                    <td><strong>${r.pontosTotais} pts</strong></td>
+                    <td>${r.placaresExatos} cravadas</td>
+                </tr>
+            `).join('');
+
+            if(rankingData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#666;">Nenhum participante registrado.</td></tr>';
+            }
+        }
+
+        // Executa o ranking inicial ao abrir a página
+        renderRanking();
+    </script>
+</body>
+</html>
