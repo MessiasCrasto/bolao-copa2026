@@ -352,84 +352,36 @@ const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwyt-8Z3nM224
 
 async function sincronizarBackup() {
 
-
-const payload = {
-    teste: "funcionando"
-};
-
-try {
-
-    const resposta = await fetch(
-        URL_GOOGLE_SCRIPT,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        }
-    );
-
-    const resultado = await resposta.json();
-
-    console.log(resultado);
-
-    alert(
-        JSON.stringify(resultado, null, 2)
-    );
-
-}
-catch (erro) {
-
-    console.error(erro);
-
-    alert(
-        "Erro: " + erro.message
-    );
-
-}
-
-
-}
-
-async function restaurarBackup() {
+    const payload = {
+        teste: "bolao"
+    };
 
     try {
 
-        const resposta =
-            await fetch(URL_GOOGLE_SCRIPT);
-
-        const dados =
-            await resposta.json();
-
-        localStorage.setItem(
-            "bolao_participantes",
-            JSON.stringify(dados.participantes)
+        const resposta = await fetch(
+            URL_GOOGLE_SCRIPT,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify(payload)
+            }
         );
 
-        localStorage.setItem(
-            "bolao_jogos",
-            JSON.stringify(dados.jogos)
-        );
+        const texto = await resposta.text();
 
-        localStorage.setItem(
-            "bolao_apostas",
-            JSON.stringify(dados.apostas)
-        );
+        console.log(texto);
 
-        alert(
-            "Backup restaurado com sucesso!"
-        );
+        alert(texto);
 
-        location.reload();
-
-    }
-    catch(erro){
+    } catch (erro) {
 
         console.error(erro);
 
         alert(
-            "Erro ao restaurar backup."
+            "Erro completo:\n" +
+            erro.message
         );
 
     }
