@@ -432,16 +432,103 @@ async function restaurarBackup() {
         alert(
             "Erro ao restaurar backup."
         );
-
     }
+}
+async function sincronizarIncremental() {
+    try {
+        const resposta =
+            await fetch(
+                URL_GOOGLE_SCRIPT +
+                "?ultima=" +
+                encodeURIComponent(
+                    localStorage.getItem("ultima_sync") || ""
+                )
+            );
+        const dados =
+            await resposta.json();
+        mesclarDados(
+            "bolao_participantes",
+            dados.participantes || []
+        );
+        mesclarDados(
+            "bolao_jogos",
+            dados.jogos || []
+        );
+        mesclarDados(
+            "bolao_apostas",
+            dados.apostas || []
+        );
+        localStorage.setItem(
+            "ultima_sync",
+            new Date().toISOString()
+        );
+        participantes =
+            JSON.parse(
+                localStorage.getItem(
+                    "bolao_participantes"
+                )
+            );
+        jogos =
+            JSON.parse(
+                localStorage.getItem(
+                    "bolao_jogos"
+                )
+            );
+        apostas =
+            JSON.parse(
+                localStorage.getItem(
+                    "bolao_apostas"
+                )
+            );
+        renderRanking();
+    }
+    catch (erro) {
 
+        console.error(
+            "Erro sincronização:",
+            erro
+        );
+    }
+}
+function mesclarDados(chave, novosDados) {
+    let locais =
+        JSON.parse(
+            localStorage.getItem(chave)
+            || "[]"
+        );
+    novosDados.forEach(novo => {
+        const idx =
+            locais.findIndex(
+                l => l.id === novo.id
+            );
+        if(idx === -1){
+            locais.push(novo);
+        } else {
+            const dataLocal =
+                locais[idx].dt_atualizacao || "";
+            const dataServidor =
+                novo.dt_atualizacao || "";
+            if(
+                dataServidor >
+                dataLocal
+            ){
+                locais[idx] = novo;
+            }
+        }
+    });
+    localStorage.setItem(
+        chave,
+        JSON.stringify(locais)
+    );
 }
 		
-setInterval(() => {
+setInterval(async () => {
 
-    sincronizarBackup();
+    await sincronizarBackup();
 
-}, 300000);
+    await sincronizarIncremental();
+
+}, 60000);
 
 
         // ==========================================
@@ -1256,7 +1343,7 @@ setInterval(() => {
                 return;
             }
 
-            const novo = { id: Date.now(), nome };
+            const novo = { id: Date.now(), nome, dt_atualizacao: new Date().toISOString() };
             participantes.push(novo);
             salvarDados();
             document.getElementById('form-participante').reset();
@@ -1359,7 +1446,8 @@ setInterval(() => {
                 jogo_id: jogoId,
                 gols_a_aposta: parseInt(golsA),
                 gols_b_aposta: parseInt(golsB),
-                pontos_conquistados: 0
+                pontos_conquistados: 0,
+				dt_atualizacao: new Date().toISOString()
             };
 
             if (idx !== -1) {
@@ -1446,7 +1534,8 @@ setInterval(() => {
             jogo.gols_b_real = parseInt(golsB);
             jogo.status = "ENCERRADO";
 
-            salvarDados();
+            jogo.dt_atualizacao = new Date().toISOString();
+			salvarDados();
             reprocessarTodasAsPontuacoes();
             alert("Placar oficial registrado! Pontuações recalculadas automaticamente.");
             renderJogosAdmin();
